@@ -56,6 +56,10 @@ Quick version:
 ```bash
 # On any Linux box with Docker (no GPU required):
 ./build-all.sh
+
+# Or, directly inside a CUDA cloud pod (no Docker needed):
+BUILD_BACKEND=native ./build-all.sh
+
 # wheels land in ./dist/
 # then publish via `gh release create`
 ```
