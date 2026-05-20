@@ -54,6 +54,9 @@ fi
 cd "$SRC_DIR"
 git fetch --all --tags -q || true
 git checkout "$SAGE_REF"
+echo "==> clean stale build artifacts from previous SM builds"
+git clean -fdx
+git reset --hard HEAD
 echo "    commit: $(git rev-parse HEAD)"
 
 echo "==> torch sanity"
