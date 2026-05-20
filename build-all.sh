@@ -8,7 +8,7 @@
 #   PY_TAG         (default: cp312)
 #   BASE_IMAGE     (default: pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel)
 #   OUT_DIR        (default: ./dist)
-#   SM_LIST        Space-separated list (default: "89 90 120")
+#   SM_LIST        Space-separated list (default: "86 89 90 120")
 #
 # On small runners (< 16 GB RAM), parallel builds of the _fused.so link step
 # can OOM. This script runs sequentially to stay safe.
@@ -24,7 +24,7 @@ export PY_TAG="${PY_TAG:-cp312}"
 export BASE_IMAGE="${BASE_IMAGE:-pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel}"
 export OUT_DIR="${OUT_DIR:-$(pwd)/dist}"
 
-SM_LIST="${SM_LIST:-89 90 120}"
+SM_LIST="${SM_LIST:-86 89 90 120}"
 
 mkdir -p "$OUT_DIR"
 
