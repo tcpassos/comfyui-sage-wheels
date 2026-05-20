@@ -42,9 +42,9 @@ Each release also includes a `SHA256SUMS` file for verification.
 
 ## Supported matrix
 
-| SAGE_VER | TORCH_VER | CUDA_TAG | PY_VER | SM archs        |
-|----------|-----------|----------|--------|-----------------|
-| 2.2.0    | 2.12.0    | cu130    | 3.12   | 89, 90, 120     |
+| SAGE_VER | TORCH_VER | CUDA_TAG | PY_VER | SM archs            |
+|----------|-----------|----------|--------|---------------------|
+| 2.2.0    | 2.12.0    | cu130    | 3.12   | 86, 89, 90, 120     |
 
 More combinations can be added on demand.
 
