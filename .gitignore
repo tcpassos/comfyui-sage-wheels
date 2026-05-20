@@ -1,0 +1,4 @@
+dist/
+*.whl
+SHA256SUMS
+.DS_Store
