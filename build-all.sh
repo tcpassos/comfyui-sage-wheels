@@ -7,6 +7,7 @@
 #   CUDA_TAG       (default: cu130)
 #   PY_TAG         (default: cp312)
 #   BASE_IMAGE     (default: pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel)
+#   BUILD_BACKEND  (default: auto; values: docker|native|auto)
 #   OUT_DIR        (default: ./dist)
 #   SM_LIST        Space-separated list (default: "86 89 90 120")
 #
@@ -22,6 +23,7 @@ export TORCH_VER="${TORCH_VER:-2.12.0}"
 export CUDA_TAG="${CUDA_TAG:-cu130}"
 export PY_TAG="${PY_TAG:-cp312}"
 export BASE_IMAGE="${BASE_IMAGE:-pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel}"
+export BUILD_BACKEND="${BUILD_BACKEND:-auto}"
 export OUT_DIR="${OUT_DIR:-$(pwd)/dist}"
 
 SM_LIST="${SM_LIST:-86 89 90 120}"
@@ -35,6 +37,7 @@ echo "  TORCH_VER  = $TORCH_VER"
 echo "  CUDA_TAG   = $CUDA_TAG"
 echo "  PY_TAG     = $PY_TAG"
 echo "  BASE_IMAGE = $BASE_IMAGE"
+echo "  BUILD_BACKEND = $BUILD_BACKEND"
 echo "  SM_LIST    = $SM_LIST"
 echo "  OUT_DIR    = $OUT_DIR"
 echo "==================================="

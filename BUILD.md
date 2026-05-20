@@ -14,7 +14,10 @@ Step-by-step to generate a new release of wheels.
 ## Option A — Cloud pod (RunPod / Vast.ai / Lambda)
 
 Works on any pod with Docker. No GPU needed on the pod, so the cheapest tier
-(~$0.05/h CPU-only) is enough.
+(~$0.05/h CPU-only) is enough. On pods that already ship PyTorch + NVCC
+(`pytorch/pytorch:*-devel`), the default `docker` backend still works when
+Docker is preinstalled, but `BUILD_BACKEND=native` is faster because it avoids
+an extra container layer.
 
 ### 1. Provision
 
@@ -76,6 +79,25 @@ tag → drag the `.whl` files + `SHA256SUMS`.
 ### 5. Tear down the pod
 
 Don't forget to destroy the cloud pod to stop billing.
+
+## Option C — Native build inside a CUDA cloud pod (no Docker)
+
+Use this when your pod is already a container based on
+`pytorch/pytorch:*-devel` or similar, and you don't want to install/run Docker
+inside it. Just provision a pod with the right CUDA image and run:
+
+```bash
+apt-get update && apt-get install -y git
+git clone https://github.com/tcpassos/comfyui-sage-wheels.git
+cd comfyui-sage-wheels
+BUILD_BACKEND=native ./build-all.sh
+```
+
+Auto-detection: if you simply run `./build-all.sh` inside a container without
+Docker installed, the scripts will pick `native` automatically.
+
+If you are not root and the deps are already there, set:
+`SKIP_APT=1 SKIP_PIP_DEPS=1`.
 
 ## Option B — Local (Linux PC / WSL2)
 
