@@ -19,23 +19,27 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 export SAGE_REF="${SAGE_REF:-main}"
-export TORCH_VER="${TORCH_VER:-2.12.0}"
-export CUDA_TAG="${CUDA_TAG:-cu130}"
-export PY_TAG="${PY_TAG:-cp312}"
 export BASE_IMAGE="${BASE_IMAGE:-pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel}"
 export BUILD_BACKEND="${BUILD_BACKEND:-auto}"
 export OUT_DIR="${OUT_DIR:-$(pwd)/dist}"
 
-SM_LIST="${SM_LIST:-86 89 90 120}"
+# TORCH_VER / CUDA_TAG / PY_TAG: only export if the user set them. Otherwise
+# build.sh auto-detects (from the running python in native mode, or by parsing
+# $BASE_IMAGE in docker mode).
+[ -n "${TORCH_VER:-}" ] && export TORCH_VER
+[ -n "${CUDA_TAG:-}" ]  && export CUDA_TAG
+[ -n "${PY_TAG:-}" ]    && export PY_TAG
+
+SM_LIST="${SM_LIST:-75 80 86 89 90 120}"
 
 mkdir -p "$OUT_DIR"
 
 echo "==================================="
 echo "Building SageAttention wheels"
 echo "  SAGE_REF   = $SAGE_REF"
-echo "  TORCH_VER  = $TORCH_VER"
-echo "  CUDA_TAG   = $CUDA_TAG"
-echo "  PY_TAG     = $PY_TAG"
+echo "  TORCH_VER  = ${TORCH_VER:-auto}"
+echo "  CUDA_TAG   = ${CUDA_TAG:-auto}"
+echo "  PY_TAG     = ${PY_TAG:-auto}"
 echo "  BASE_IMAGE = $BASE_IMAGE"
 echo "  BUILD_BACKEND = $BUILD_BACKEND"
 echo "  SM_LIST    = $SM_LIST"
@@ -52,6 +56,28 @@ echo
 echo "==> Generating SHA256SUMS"
 ( cd "$OUT_DIR" && sha256sum sageattention-*.whl > SHA256SUMS )
 cat "$OUT_DIR/SHA256SUMS"
+
+# If values weren't provided up front, detect them now so the suggested tag
+# matches the wheels we just produced.
+if [ -z "${TORCH_VER:-}" ] || [ -z "${CUDA_TAG:-}" ] || [ -z "${PY_TAG:-}" ]; then
+    _detected="$(python - <<'PY' 2>/dev/null || true
+import sys
+try:
+    import torch
+    tv = torch.__version__.split("+")[0]
+    cu = (torch.version.cuda or "").replace(".", "")
+except Exception:
+    tv, cu = "", ""
+py = f"cp{sys.version_info.major}{sys.version_info.minor}"
+print(f"{tv}|{cu}|{py}")
+PY
+)"
+    _tv="${_detected%%|*}"; _rest="${_detected#*|}"
+    _cu="${_rest%%|*}"; _py="${_rest#*|}"
+    TORCH_VER="${TORCH_VER:-${_tv:-unknown}}"
+    CUDA_TAG="${CUDA_TAG:-cu${_cu:-unknown}}"
+    PY_TAG="${PY_TAG:-${_py:-cp312}}"
+fi
 
 echo
 echo "==> Suggested tag:"

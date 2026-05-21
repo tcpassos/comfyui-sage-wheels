@@ -36,9 +36,6 @@ case "$SM" in
 esac
 
 SAGE_REF="${SAGE_REF:-main}"
-TORCH_VER="${TORCH_VER:-2.12.0}"
-CUDA_TAG="${CUDA_TAG:-cu130}"
-PY_TAG="${PY_TAG:-cp312}"
 BASE_IMAGE="${BASE_IMAGE:-pytorch/pytorch:2.12.0-cuda13.0-cudnn9-devel}"
 OUT_DIR="${OUT_DIR:-$(pwd)/dist}"
 MAX_JOBS="${MAX_JOBS:-4}"
@@ -58,6 +55,39 @@ if [ "$BUILD_BACKEND" = "auto" ]; then
     else
         RESOLVED_BUILD_BACKEND="docker"
     fi
+fi
+
+# Auto-detect TORCH_VER / CUDA_TAG / PY_TAG. In native mode they come from the
+# running interpreter; in docker mode we parse them out of $BASE_IMAGE.
+# Any of the three can be overridden by exporting it explicitly.
+if [ "$RESOLVED_BUILD_BACKEND" = "native" ]; then
+    if [ -z "${TORCH_VER:-}" ] || [ -z "${CUDA_TAG:-}" ] || [ -z "${PY_TAG:-}" ]; then
+        _detected="$(python - <<'PY' 2>/dev/null || true
+import sys
+try:
+    import torch
+    tv = torch.__version__.split("+")[0]
+    cu = (torch.version.cuda or "").replace(".", "")
+except Exception:
+    tv, cu = "", ""
+py = f"cp{sys.version_info.major}{sys.version_info.minor}"
+print(f"{tv}|{cu}|{py}")
+PY
+)"
+        _tv="${_detected%%|*}"; _rest="${_detected#*|}"
+        _cu="${_rest%%|*}"; _py="${_rest#*|}"
+        TORCH_VER="${TORCH_VER:-${_tv:-2.12.0}}"
+        CUDA_TAG="${CUDA_TAG:-cu${_cu:-130}}"
+        PY_TAG="${PY_TAG:-${_py:-cp312}}"
+    fi
+else
+    # Parse "pytorch/pytorch:<torch>-cuda<cu>-..." into defaults.
+    _img_tag="${BASE_IMAGE##*:}"
+    _img_torch="$(echo "$_img_tag" | sed -nE 's/^([0-9]+\.[0-9]+\.[0-9]+).*/\1/p')"
+    _img_cu="$(echo "$_img_tag"    | sed -nE 's/.*cuda([0-9]+)\.([0-9]+).*/\1\2/p')"
+    TORCH_VER="${TORCH_VER:-${_img_torch:-2.12.0}}"
+    CUDA_TAG="${CUDA_TAG:-cu${_img_cu:-130}}"
+    PY_TAG="${PY_TAG:-cp312}"
 fi
 
 mkdir -p "$OUT_DIR"
