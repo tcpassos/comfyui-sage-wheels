@@ -91,8 +91,8 @@ RunPod or Vast.ai with:
 ### 2. Clone and build
 
 ```bash
-git clone https://github.com/tcpassos/comfyui-sage-wheels.git
-cd comfyui-sage-wheels
+git clone https://github.com/tcpassos/sage-wheels-linux.git
+cd sage-wheels-linux
 
 # Build every arch declared in build-all.sh (auto-picks docker or native)
 ./build-all.sh
@@ -149,7 +149,7 @@ check:
 
 ```bash
 gh api user --jq .login                                # must match the repo owner
-gh api repos/tcpassos/comfyui-sage-wheels --jq .permissions
+gh api repos/tcpassos/sage-wheels-linux --jq .permissions
 # expected to include push:true
 ```
 
@@ -169,7 +169,7 @@ echo "$TAG"
 
 ```bash
 gh release create "$TAG" \
-    --repo tcpassos/comfyui-sage-wheels \
+    --repo tcpassos/sage-wheels-linux \
     --title "$TAG" \
     --notes "Sage ${SAGE_VER} compiled against PyTorch ${TORCH_VER} + CUDA ${CUDA_TAG}, Python 3.${PY_DIGITS:1}. Built on $(date -u +%F)." \
     dist/sageattention-*.whl dist/SHA256SUMS
@@ -197,8 +197,8 @@ inside it. Provision a pod with the right CUDA image and run:
 
 ```bash
 apt-get update && apt-get install -y git
-git clone https://github.com/tcpassos/comfyui-sage-wheels.git
-cd comfyui-sage-wheels
+git clone https://github.com/tcpassos/sage-wheels-linux.git
+cd sage-wheels-linux
 BUILD_BACKEND=native ./build-all.sh
 ```
 

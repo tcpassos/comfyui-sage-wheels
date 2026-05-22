@@ -1,4 +1,4 @@
-# comfyui-sage-wheels
+# sage-wheels-linux
 
 Pre-built Linux wheels of [SageAttention 2.x](https://github.com/thu-ml/SageAttention),
 distributed via GitHub Releases for use with the
@@ -30,9 +30,12 @@ Each release also includes a `SHA256SUMS` file for verification.
 
 ## Supported matrix
 
-| SAGE_VER | TORCH_VER | CUDA_TAG | PY_VER | SM archs                |
-|----------|-----------|----------|--------|-------------------------|
-| 2.2.0    | 2.12.0    | cu130    | 3.12   | 75, 80, 86, 89, 90, 120 |
+| SAGE_VER | TORCH_VER | CUDA_TAG | PY_VER | SM archs                | Paired Docker tag                  |
+|----------|-----------|----------|--------|-------------------------|------------------------------------|
+| 2.2.0    | 2.12.0    | cu130    | 3.12   | 75, 80, 86, 89, 90, 120 | `tcpassos/comfyui-cloud:latest`    |
+| 2.2.0    | 2.11.0    | cu128    | 3.12   | 75, 80, 86, 89, 90, 120 | `tcpassos/comfyui-cloud:cu128`     |
+
+The paired Docker tag is the [`tcpassos/comfyui-cloud`](https://hub.docker.com/r/tcpassos/comfyui-cloud) image whose torch / CUDA / Python combo matches the release tag — the image's entrypoint queries this repo at boot and pulls the wheel matching the GPU's SM.
 
 More combinations can be added on demand.
 
